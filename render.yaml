@@ -1,0 +1,13 @@
+# Render Blueprint: one Web Service serves both the game and the judge API.
+services:
+  - type: web
+    name: ai-fight
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
