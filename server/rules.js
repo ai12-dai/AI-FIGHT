@@ -18,10 +18,11 @@ export const CRITERIA = [
   { key: 'rebuttal', weight: 10, label: 'Контраргументы', en: 'Rebuttal' },
 ];
 
-// Draw band: totals this close are a draw no matter what.
-export const DRAW_EPSILON = 1;
-// The judge may call a draw when totals are within this many points.
-export const DRAW_ALLOWED = 5;
+// A draw happens only when the totals are equal AND the judge's tie-break on
+// substance (rule compliance, evidence, manipulation...) finds no difference.
+export const DRAW_EPSILON = 0;
+// The judge may explicitly call a draw when totals are within this many points.
+export const DRAW_ALLOWED = 2;
 
 const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 
@@ -63,13 +64,18 @@ export function finalizeVerdict(raw, meta = {}) {
     c1[key] = clamp(Math.round(Number(raw.player1_criteria?.[key]) || 0), 0, 100);
     c2[key] = clamp(Math.round(Number(raw.player2_criteria?.[key]) || 0), 0, 100);
   }
-  const s1 = weightedTotal(c1);
-  const s2 = weightedTotal(c2);
+  let s1 = weightedTotal(c1);
+  let s2 = weightedTotal(c2);
   const diff = s1 - s2;
   let winner;
-  if (Math.abs(diff) <= DRAW_EPSILON) winner = 'draw';
-  else if (raw.winner === 'draw' && Math.abs(diff) <= DRAW_ALLOWED) winner = 'draw';
-  else winner = diff > 0 ? 'player1' : 'player2';
+  if (raw.winner === 'draw' && Math.abs(diff) <= DRAW_ALLOWED) winner = 'draw';
+  else if (Math.abs(diff) <= DRAW_EPSILON) {
+    // Equal totals: the judge's tie-break decides; the winner gets the deciding
+    // point so the scoreboard, the verdict and the fight always agree.
+    if (raw.tiebreak === 'player1') { winner = 'player1'; s1 += 1; }
+    else if (raw.tiebreak === 'player2') { winner = 'player2'; s2 += 1; }
+    else winner = 'draw';
+  } else winner = diff > 0 ? 'player1' : 'player2';
   const list = (a) => (Array.isArray(a) ? a.map(String).filter(Boolean).slice(0, 6) : []);
   return {
     winner,

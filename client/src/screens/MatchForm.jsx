@@ -18,11 +18,11 @@ function PlayerBlock({ who, fighter, name, arg, setName, setArg }) {
       </header>
       <label>
         <span>Имя участника</span>
-        <input value={name} maxLength={LIMITS.nameMax} onChange={(e) => setName(e.target.value)} placeholder={who === 'p1' ? 'Например, Айгерим' : 'Например, Тимур'} autoComplete="off" />
+        <input value={name} maxLength={LIMITS.nameMax} onChange={(e) => setName(e.target.value)} placeholder={`Например, ${who === 'p1' ? EXAMPLE.name1 : EXAMPLE.name2}`} autoComplete="off" />
       </label>
       <label>
         <span>Позиция и аргументы</span>
-        <textarea value={arg} maxLength={LIMITS.argMax} rows={7} onChange={(e) => setArg(e.target.value)} placeholder="Сформулируйте позицию и объясните, почему вы правы…" />
+        <textarea value={arg} maxLength={LIMITS.argMax} rows={7} onChange={(e) => setArg(e.target.value)} placeholder={`Например: ${who === 'p1' ? EXAMPLE.p1 : EXAMPLE.p2}`} />
       </label>
       <div className={`counter ${tooShort ? 'warn' : ''}`}>
         {tooShort ? `минимум ${LIMITS.argMin} символов и ${LIMITS.argMinWords} слов · ` : ''}{arg.length} / {LIMITS.argMax}
@@ -52,7 +52,7 @@ export default function MatchForm({ match, update, go, f1, f2 }) {
   const fillExample = () => {
     edit({
       topic: EXAMPLE.topic,
-      names: { p1: match.names.p1 || 'Айгерим', p2: match.names.p2 || 'Тимур' },
+      names: { p1: EXAMPLE.name1, p2: EXAMPLE.name2 },
       args: { p1: EXAMPLE.p1, p2: EXAMPLE.p2 },
     });
   };
@@ -62,7 +62,7 @@ export default function MatchForm({ match, update, go, f1, f2 }) {
       <h2 className="screen-title">ENTER THE DEBATE</h2>
       <label className="topic">
         <span>TOPIC — тема спора</span>
-        <input value={match.topic} maxLength={LIMITS.topicMax} onChange={(e) => edit({ topic: e.target.value })} placeholder="Например: «Удалённая работа эффективнее работы в офисе»" autoComplete="off" />
+        <input value={match.topic} maxLength={LIMITS.topicMax} onChange={(e) => edit({ topic: e.target.value })} placeholder={`Например: ${EXAMPLE.topic}`} autoComplete="off" />
       </label>
       <div className="pblocks">
         <PlayerBlock who="p1" fighter={f1} name={match.names.p1} arg={match.args.p1} setName={setName('p1')} setArg={setArg('p1')} />

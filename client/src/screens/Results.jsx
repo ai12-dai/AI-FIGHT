@@ -83,11 +83,32 @@ export default function Results({ verdict: v, match, f1, f2, arena, onRematch, o
         </section>
       </div>
 
+      {v.analysis?.facts?.length > 0 && (
+        <section className="panel">
+          <h3>АНАЛИЗ ФАКТОВ</h3>
+          {v.analysis.context === 'cycles' && (
+            <details className="rules-box">
+              <summary>Учтены правила работы с циклами</summary>
+              <ul>{v.analysis.rules.map((r, i) => <li key={i}>{r}</li>)}</ul>
+            </details>
+          )}
+          <ul className="facts">
+            {v.analysis.facts.map((x, i) => (
+              <li key={i} className={`fact fact-${x.type} ${x.side}`}>
+                <span className="fact-who">{x.side === 'player1' ? names.p1 : names.p2}</span>
+                <span className="fact-tag">{x.label}</span>
+                <span className="fact-text">«{x.text}»</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <section className="panel">
         <h3>РЕШЕНИЕ СУДЬИ</h3>
         <p className="reasoning">{v.reasoning}</p>
         <p className="meta">
-          Тестовый судья
+          Судья: правила и анализ фактов
           {v.confidence ? ` · уверенность: ${{ low: 'низкая', medium: 'средняя', high: 'высокая' }[v.confidence] || v.confidence}` : ''}
         </p>
       </section>
